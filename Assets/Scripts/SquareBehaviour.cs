@@ -42,14 +42,24 @@ public class SquareBehaviour : MonoBehaviour
     [SerializeField]
     private Color bronzeColour2;
 
+    // color for the square, to be revealed when scaned
     private Color squareColor = new Color(1.0f, 1.0f, 1.0f, 1.0f);
 
+    // position of square among the others
     private Vector2 positionVector = Vector2.zero;
     public Vector2 PositionVector { get { return positionVector; } }
 
     // The value of the resources in the square
     private Metal metal = Metal.NONE;
     private Cut cut = Cut.NONE;
+
+    // Reference to playerstats
+    PlayerStats player = null;
+
+    private void Start()
+    {
+        player = FindObjectOfType<PlayerStats>();
+    }
 
     // Vector to keep track of the square's position in the grid
     public void setPositionVector(int x, int y)
@@ -112,25 +122,51 @@ public class SquareBehaviour : MonoBehaviour
 
     public void Reveal()
     {
-        SquareBehaviour[] squares = FindObjectsOfType<SquareBehaviour>();
-
-        foreach (var item in squares)
+        // if in scan mode and has scan left, proceed to reveal
+        if (player.CurrentMode == PlayerMode.SCAN && player.canScan())
         {
-            if (item.PositionVector.x >= (positionVector.x -2) && item.PositionVector.x <= (positionVector.x+2))
+            SquareBehaviour[] squares = FindObjectsOfType<SquareBehaviour>();
+            foreach (var item in squares)
             {
-                if (item.PositionVector.y >= (positionVector.y-2) && item.PositionVector.y <= (positionVector.y+2))
+                if (item.PositionVector.x >= (positionVector.x - 2) && item.PositionVector.x <= (positionVector.x + 2))
                 {
-                    item.GetComponent<Image>().color = item.squareColor;
+                    if (item.PositionVector.y >= (positionVector.y - 2) && item.PositionVector.y <= (positionVector.y + 2))
+                    {
+                        item.GetComponent<Image>().color = item.squareColor;
+                    }
+                }
+                if (item.PositionVector.x >= (positionVector.x - 1) && item.PositionVector.x <= (positionVector.x + 1))
+                {
+                    if (item.PositionVector.y >= (positionVector.y - 1) && item.PositionVector.y <= (positionVector.y + 1))
+                    {
+                        item.GetComponent<Image>().color = item.squareColor;
+                    }
                 }
             }
-            if (item.PositionVector.x >= (positionVector.x-1) && item.PositionVector.x <= (positionVector.x+1))
+            gameObject.GetComponent<Image>().color = squareColor;
+        }
+
+        if (player.CurrentMode == PlayerMode.EXTRACT && player.canExtract())
+        {
+            SquareBehaviour[] squares = FindObjectsOfType<SquareBehaviour>();
+            foreach (var item in squares)
             {
-                if (item.PositionVector.y >= (positionVector.y-1) && item.PositionVector.y <= (positionVector.y+1))
+                if (item.PositionVector.x >= (positionVector.x - 1) && item.PositionVector.x <= (positionVector.x + 1))
                 {
-                    item.GetComponent<Image>().color = item.squareColor;
+                    if (item.PositionVector.y >= (positionVector.y - 1) && item.PositionVector.y <= (positionVector.y + 1))
+                    {
+                        player.extract(item.metal, item.cut);
+                        item.clearSquare();
+                    }
                 }
             }
         }
-        gameObject.GetComponent<Image>().color = squareColor;
+    }
+
+    private void clearSquare()
+    {
+        metal = Metal.NONE;
+        cut = Cut.NONE;
+        GetComponent<Image>().color = new Color(0.0f, 0.0f, 0.0f, 1.0f);
     }
 }
