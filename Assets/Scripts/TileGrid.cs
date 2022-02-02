@@ -13,17 +13,11 @@ public class TileGrid : MonoBehaviour
     private float distanceBetween = 4;
 
     [SerializeField, Header("Resource Management")]
-    private int goldMax = 5;
+    private int goldMax = 3;
     [SerializeField]
-    private int silverMax = 10;
+    private int silverMax = 5;
     [SerializeField]
-    private int bronzeMax = 20;
-    [SerializeField]
-    private int goldValue = 300;
-    [SerializeField]
-    private int silverValue = 200;
-    [SerializeField]
-    private int bronzeValue = 100;
+    private int bronzeMax = 10;
 
     private int[,] gridArray;
     List<SquareBehaviour> squares = new List<SquareBehaviour>();
